@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 #display PID of bash
 
-echo "$$"
+ps -auxf | grep bash
