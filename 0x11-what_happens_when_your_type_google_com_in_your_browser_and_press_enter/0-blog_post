@@ -1,0 +1,37 @@
+What Happens When You Type https://www.google.com in Your Browser and Press Enter
+
+As we navigate the internet, have you ever wondered what happens behind the scenes when you type a URL into your browser and press Enter? In this article, we'll delve into the intricacies of the web stack and explore the journey of a request from your browser to the Google server.
+
+DNS Request
+
+The journey begins with a DNS (Domain Name System) request. When you type https://www.google.com, your browser sends a request to a DNS resolver to look up the IP address associated with the domain name www.google.com. The DNS resolver checks its cache and then queries a DNS server, which in turn queries other DNS servers until it finds the authoritative DNS server for google.com. The authoritative DNS server returns the IP address associated with www.google.com, which is then cached by the DNS resolver for future requests.
+
+TCP/IP
+
+Once the IP address is obtained, your browser establishes a connection with the Google server using the TCP/IP protocol. TCP (Transmission Control Protocol) ensures that data is delivered in the correct order, while IP (Internet Protocol) routes the data packets between networks. The three-way handshake (SYN, SYN-ACK, ACK) is initiated to establish a connection between your browser and the Google server.
+
+Firewall
+
+As the request passes through the internet, it may encounter firewalls that filter incoming and outgoing traffic based on predetermined security rules. Firewalls can block or allow traffic based on factors such as source IP address, destination IP address, and port numbers.
+
+HTTPS/SSL
+
+Since we're using HTTPS (Hypertext Transfer Protocol Secure), the connection is encrypted using SSL/TLS (Secure Sockets Layer/Transport Layer Security) protocol. This ensures that the data exchanged between your browser and the Google server remains confidential and cannot be intercepted or tampered with.
+
+Load-Balancer
+
+When the request reaches the Google server, it may be directed to a load balancer, which distributes incoming traffic across multiple servers to ensure scalability and high availability. The load balancer directs the request to an available server, which can handle the request.
+
+Web Server
+
+The request is then received by a web server, such as Apache or Nginx, which processes the request and returns an HTTP response. The web server may also perform tasks such as caching, compression, and SSL termination.
+
+Application Server
+
+The request may be further processed by an application server, which executes the business logic and interacts with the database. The application server may be responsible for tasks such as authentication, authorization, and data processing.
+
+Database
+
+Finally, the request may involve interactions with a database, which stores and retrieves data. The database may be a relational database management system such as MySQL or a NoSQL database such as MongoDB.
+
+In conclusion, when you type https://www.google.com in your browser and press Enter, a complex sequence of events unfolds, involving DNS requests, TCP/IP connections, firewalls, HTTPS/SSL encryption, load balancers, web servers, application servers, and databases. Understanding this workflow is essential for software engineers, as it provides insight into the inner workings of the web stack and enables them to design and develop scalable, secure, and efficient systems.
