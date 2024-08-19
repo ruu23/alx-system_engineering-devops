@@ -1,32 +1,34 @@
-On the release day of ALX's System Engineering & DevOps project 0x19, at approximately 06:00 West African Time (WAT) in Nigeria, an outage occurred on a standalone Ubuntu 14.04 container hosting an Apache web server. The issue was that GET requests to the server resulted in 500 Internal Server Error responses, instead of serving the expected HTML file for a basic Holberton WordPress site.
+Postmortem
+On the launch day of ALX's System Engineering & DevOps project 0x19, at around 06:00 West African Time (WAT) in Nigeria, a significant outage occurred on an isolated Ubuntu 14.04 container running an Apache web server. The problem manifested as 500 Internal Server Error responses when GET requests were made to the server, instead of the expected HTML output for a simple Holberton WordPress site.
 
 Troubleshooting Steps
-Our primary debugger, Brennan (who cleverly goes by BDB—catchy, right?), identified the problem around 19:20 PST when tasked with investigating the issue. The following steps were taken to resolve the problem:
+Our lead troubleshooter, Brennan (affectionately known as BDB—because catchy initials are important), detected the issue around 19:20 PST. The following steps were taken to identify and resolve the problem:
 
-Process Check: Brennan verified running processes using ps aux. Two apache2 processes—root and www-data—were confirmed to be active.
+Process Verification: Brennan initiated the investigation by running ps aux to verify active processes. Two apache2 processes were running correctly—one under root and the other under www-data.
 
-Directory Examination: He navigated to the sites-available folder within the /etc/apache2/ directory and confirmed that the web server was serving files from /var/www/html/.
+Directory Check: He then examined the contents of the sites-available folder within the /etc/apache2/ directory and confirmed that the server was serving files from the /var/www/html/ directory.
 
-Strace Analysis: In one terminal, he ran strace on the PID of the root Apache process while curling the server in another terminal. Unfortunately, strace provided no useful output.
+Strace Analysis: Brennan utilized strace on the PID of the root Apache process while making curl requests to the server. However, this initial attempt yielded no useful information.
 
-Strace Retry: Brennan repeated the strace procedure on the PID of the www-data process, this time with lower expectations, but struck gold! The strace output revealed an -1 ENOENT (No such file or directory) error when trying to access /var/www/html/wp-includes/class-wp-locale.phpp.
+Strace Retry: Undeterred, Brennan ran strace on the www-data process. This time, he struck gold! The output showed an -1 ENOENT (No such file or directory) error when the server attempted to access /var/www/html/wp-includes/class-wp-locale.phpp.
 
-File Inspection: He searched the /var/www/html/ directory files individually using Vim to locate the erroneous .phpp file extension. The issue was found in the wp-settings.php file (Line 137, require_once(ABSPATH . WPINC . '/class-wp-locale.php');).
+File Examination: Brennan meticulously combed through the files in the /var/www/html/ directory using Vim, searching for the incorrect .phpp extension. The error was located in the wp-settings.php file at Line 137 (require_once(ABSPATH . WPINC . '/class-wp-locale.php');).
 
-Error Fix: Brennan removed the extra trailing p from the line.
+Error Correction: He promptly removed the extraneous p from the file extension.
 
-Validation: A follow-up curl request to the server returned a successful 200 OK response.
+Validation: Brennan tested the fix by making another curl request to the server, which successfully returned a 200 OK response.
 
-Automation: To prevent future occurrences, a Puppet manifest was written to automate the correction of similar errors.
+Automation: To prevent similar issues in the future, Brennan wrote a Puppet manifest to automate the correction of this type of error.
 
 Summary
-The root cause of the outage was a simple typo in the wp-settings.php file, where a trailing p was mistakenly added, resulting in the system failing to locate the correct file (class-wp-locale.php). The typo was corrected, and normal service was restored.
+The root cause of the outage was a simple typo in the wp-settings.php file—a stray p at the end of the filename class-wp-locale.phpp. This typo prevented the system from locating the correct file, causing the application to crash. The error was corrected, and normal functionality was restored.
 
 Prevention and Recommendations
-This incident was an application-level error, not a web server malfunction. To avoid similar outages in the future, consider the following:
+This incident was due to an application error, not a web server malfunction. To avoid similar issues in the future, the following steps are recommended:
 
-Thorough Testing: Ensure the application is rigorously tested before deployment. This error could have been identified and resolved much earlier if proper testing had been conducted.
+Comprehensive Testing: Always perform thorough testing of the application before deployment. This issue could have been detected and resolved earlier if proper testing had been conducted.
 
-Monitoring: Implement an uptime-monitoring service like UptimeRobot to receive immediate alerts if the website goes down.
+Monitoring Setup: Implement an uptime-monitoring service such as UptimeRobot to receive immediate alerts if the website experiences downtime.
 
-As a response to this issue, a Puppet manifest 0-strace_is_your_friend.pp was created to automatically correct any instances of phpp file extensions in the /var/www/html/wp-settings.php file. However, we're confident this won't be needed again—because as developers, we never make mistakes, right? :wink:
+In response to this incident, a Puppet manifest 0-strace_is_your_friend.pp was created to automatically correct any occurrences of phpp extensions in the /var/www/html/wp-settings.php file. However, we're confident this won't be needed again—because as developers, we never make mistakes, right? 😉
+
